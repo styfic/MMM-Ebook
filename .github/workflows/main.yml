@@ -1,0 +1,17 @@
+on: workflow_dispatch
+# on:
+#   schedule:
+#   - cron: "0 0 * * *"[]
+jobs:
+  regenerate-ebooks:
+    runs-on: ubuntu-latest
+    name: Regenerate Ebooks
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - run: sudo apt install calibre
+      - run: ./generate-ebooks.py
