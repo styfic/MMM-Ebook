@@ -2,7 +2,7 @@ This is a fork of [beege/MMM-Ebook](https://github.com/beege/MMM-Ebook]) updated
 
 This utility scrapes Mr. Money Mustache's blog (http://www.mrmoneymustache.com/) and outputs HTML pages to import through a tool such as Calibre to create into an EBook of the desired format.
 
-The bundled ebooks are current as of February 2022.
+The ebooks in this repo are updated weekly with new posts by an automated CI script.
 
 ### Use
 
