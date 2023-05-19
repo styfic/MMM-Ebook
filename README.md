@@ -1,8 +1,8 @@
+**The ebooks in this repo are updated weekly with new posts by an automated Github action.**
+
 This is a fork of [beege/MMM-Ebook](https://github.com/beege/MMM-Ebook]) updated to use Python3 and generate ebooks so you do not need to manually generate ebooks in Calibre, and to include images hosted at mrmoneymustache.com.
 
-This utility scrapes Mr. Money Mustache's blog (http://www.mrmoneymustache.com/) and outputs HTML pages to import through a tool such as Calibre to create into an EBook of the desired format.
-
-The ebooks in this repo are updated weekly with new posts by an automated CI script.
+This utility pulls a list of posts from Mr. Money Mustache's blog (http://www.mrmoneymustache.com/) via RSS, scrapes the pages that are not cached locally, and outputs ePub, mobi, azw3, pdf ebooks plus HTML pages that can be imported through a tool like Calibre to create into an EBook of your desired format.
 
 ### Use
 
@@ -14,6 +14,6 @@ In the repo root run ```pip3 install -r requirements.txt``` to install python de
 
 ### MMM Approved!
 
-You can see Mr Money Mustache's endorsement of this project [here](https://forum.mrmoneymustache.com/welcome-to-the-forum/making-a-mr-money-mustache-ebook/).
+Mr. Money Mustache endorsed the original version of this project, which I forked, [here](https://forum.mrmoneymustache.com/welcome-to-the-forum/making-a-mr-money-mustache-ebook/).
 
 "Awesome work!! You hereby have my full approval to share this book (and work together to improve it if you like). As long as you give it away for free!"
