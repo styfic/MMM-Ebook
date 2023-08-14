@@ -178,15 +178,14 @@ def rewritePostLinks(posts, postsInOrder):
         and edits earlier posts to include a link to a later posting"""
         
     print("Rewriting post links...")
-            
+
     for url in postsInOrder:
         post = posts[url]
-        text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
-
         for url2 in postsInOrder:
-            regex = re.compile('<a\\s(.*href=")%s(".*)>(.*)</a>' % url2)
+            regex = re.compile('<a\\s(.*href=\")%s(\".*)>(.*)<\/a>' % url2.decode('utf-8'))
+            text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
             post.text = regex.sub('<a \\1' + posts[url2].localUrl + '\\2>\\3</a>', text)
-            
+
 def rewriteImageLinks(posts):
     print("Rewriting image links...")
 
