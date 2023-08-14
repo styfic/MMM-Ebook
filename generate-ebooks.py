@@ -132,9 +132,10 @@ class Post(object):
         it down into posts"""
     next = 0
 
-    def __init__(self, title, text, date, author, num=None):
+    def __init__(self, title, url, text, date, author, num=None):
         self.title = title
         self.text = text
+        self.url = url
         self.date = date
         self.author = author
         
@@ -143,17 +144,15 @@ class Post(object):
             Post.next = Post.next + 1
             self.localUrl = 'p%04d.html' % (num, )
 
-def createPostingsFromParsedRss(parsers):
+def createPostsFromRss(parsers):
     """Create a list of all the posts from the RSS data"""
-    postsInOrder = []
-    posts = {}
+    posts = []
     
     for parser in parsers:
         for (title, text, url, date, author) in parser.parse():
-            postsInOrder.append(url)
-            posts[url] = Post(title, text, date, author)      
+            posts.append(Post(title, url, text, date, author)      )
 
-    return (posts, postsInOrder)
+    return posts
     
                             
 def getCachedUrlMaps():
@@ -173,18 +172,22 @@ def saveUrlMaps(remoteToLocal, localToRemote):
         
     pickle.dump((remoteToLocal, localToRemote), open(CACHED_URL_MAP, 'wb'))
     
-def rewritePostLinks(posts, postsInOrder):
+def rewritePostLinks(posts):
     """We do this once we have all the posts since sometimes MMM goes back
         and edits earlier posts to include a link to a later posting"""
         
     print("Rewriting post links...")
 
-    for url in postsInOrder:
-        post = posts[url]
-        for url2 in postsInOrder:
-            regex = re.compile('<a\\s(.*href=\")%s(\".*)>(.*)<\/a>' % url2.decode('utf-8'))
+    # Generate mapping of web to local post urls.
+    postWebToLocalURLDictionary = {}
+    for post in posts:
+        postWebToLocalURLDictionary[post.url] = post.localUrl
+
+    for post in posts:
+        for url in postWebToLocalURLDictionary.keys():
+            regex = re.compile('<a\\s(.*href=\")%s(\".*)>(.*)<\/a>' % url.decode('utf-8'))
             text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
-            post.text = regex.sub('<a \\1' + posts[url2].localUrl + '\\2>\\3</a>', text)
+            post.text = regex.sub('<a \\1' + postWebToLocalURLDictionary[url] + '\\2>\\3</a>', text)
 
 def rewriteImageLinks(posts):
     print("Rewriting image links...")
@@ -192,11 +195,17 @@ def rewriteImageLinks(posts):
     if not os.path.isdir(CACHED_MEDIA):
         os.mkdir(CACHED_MEDIA)
 
-    for post in posts.values():
+    for post in posts:
         text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
+        
+        # Drop featured image. When preset it's usually just a duplicate of the top image in the post
+        text = re.sub(r'<a class=\"featured_image_link\".*</a>', "", text)
+        
         tree = ET.HTML(text)
-
         for image in tree.findall('.//img'):
+            # Drop responsive images
+            image.attrib.pop('srcset', None)
+
             imageurl = image.attrib["src"]
 
             # Skip images embedded in the html
@@ -204,7 +213,6 @@ def rewriteImageLinks(posts):
                 continue
 
             urlParseResult = urlparse(imageurl)
-            path = urlParseResult.path
             imageFilename = urlParseResult.path.replace("/", "", 1) .replace("/", "_") # Create name from full path to help avoid accidentally overriding images, wordpress image paths have date component
 
             # Only include images actually hosted on mrmoneymustache.com
@@ -237,11 +245,10 @@ def rewriteImageLinks(posts):
             outputImageAbsolutePath = os.path.join(MEDIA, imageFilename)
             outputImageRelativePath = os.path.relpath(outputImageAbsolutePath, BOOK_DATA)
             shutil.copyfile(cachedImagePath, outputImageAbsolutePath)
-            text = re.sub(r'srcset=".*"', "", text)
-            text = text.replace(imageurl, outputImageRelativePath)
-        post.text = text
+            image.attrib['src'] = outputImageRelativePath
+        post.text = ET.tostring(tree, encoding='utf8')
     
-def createBookData(posts, postsInOrder):
+def createBookData(posts):
     print("Creating book data...")
     
     shutil.copyfile(COVER_PATH, os.path.join(BOOK_DATA, 'Cover.png'))
@@ -262,8 +269,7 @@ def createBookData(posts, postsInOrder):
       <p style="text-indent:0pt">''')
 
     chapter = 0
-    for url in postsInOrder:
-        post = posts[url]
+    for post in posts:
         text = post.text if isinstance(post.text, str) else post.text.decode('utf-8')
         
         open(os.path.join(BOOK_DATA, post.localUrl), 'w').write(
@@ -275,8 +281,8 @@ def createBookData(posts, postsInOrder):
                 '</head>\n' + \
                 '<body>\n' + \
                     '<h1 class="chapter">' + post.title.decode('utf-8') + "</h1>\n" + \
-                    '<h2>By ' + post.author.decode('utf-8') + "</h2>\n" + \
-                    '<h2> ' + post.date.decode('utf-8') + "</h2>\n" + \
+                    '<h3>By ' + post.author.decode('utf-8') + "</h3>\n" + \
+                    '<h4> ' + post.date.decode('utf-8') + "</h4>\n" + \
                     text + \
                 '</body>' + \
             '</html>')
@@ -305,10 +311,10 @@ def main():
     os.mkdir(MEDIA)
 
     parsers = getRssData()
-    (posts, postsInOrder) = createPostingsFromParsedRss(parsers)
-    rewritePostLinks(posts, postsInOrder)
+    posts = createPostsFromRss(parsers)
+    rewritePostLinks(posts)
     rewriteImageLinks(posts)
-    createBookData(posts, postsInOrder)
+    createBookData(posts)
     generateEbooks()
             
 if __name__=="__main__":
