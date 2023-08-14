@@ -198,6 +198,11 @@ def rewriteImageLinks(posts):
 
         for image in tree.findall('.//img'):
             imageurl = image.attrib["src"]
+
+            # Skip images embedded in the html
+            if imageurl.startswith("data:image"):
+                continue
+
             urlParseResult = urlparse(imageurl)
             path = urlParseResult.path
             imageFilename = urlParseResult.path.replace("/", "", 1) .replace("/", "_") # Create name from full path to help avoid accidentally overriding images, wordpress image paths have date component
