@@ -228,7 +228,7 @@ def rewriteImageLinks(posts):
                     except IOError as e:
                         print(f'Failed to open image at path {cachedImagePath} for resize, caching at original resolution, error: {e}')
                 except Exception as e:
-                    print(f"Caching image {imageurl} to {localpath} failed with exception {e}")
+                    print(f"Caching image {imageurl} to {cachedImagePath} failed with exception {e}")
 
             outputImageAbsolutePath = os.path.join(MEDIA, imageFilename)
             outputImageRelativePath = os.path.relpath(outputImageAbsolutePath, BOOK_DATA)
