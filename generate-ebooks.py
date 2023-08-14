@@ -13,6 +13,7 @@ import subprocess
 from PIL import Image, ImageFile
 import time
 from datetime import date
+from dateutil.parser import parser
 
 # Cached data (RSS feed XML)
 CACHED_DATA = os.path.join(os.path.dirname(__file__), ".cached")
@@ -282,7 +283,7 @@ def createBookData(posts):
                 '<body>\n' + \
                     '<h1 class="chapter">' + post.title.decode('utf-8') + "</h1>\n" + \
                     '<h3>By ' + post.author.decode('utf-8') + "</h3>\n" + \
-                    '<h4> ' + post.date.decode('utf-8') + "</h4>\n" + \
+                    '<h4> ' + parser().parse(post.date.decode('utf-8')).strftime("%A %B %-d, %Y") + "</h4>\n" + \
                     text + \
                 '</body>' + \
             '</html>')
