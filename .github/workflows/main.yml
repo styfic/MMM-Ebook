@@ -1,11 +1,4 @@
-on:
-
-  # Required to enable manual trigger
-  workflow_dispatch:
-
-  schedule:
-     - cron: "0 0 * * 0"
-
+on: workflow_dispatch
 jobs:
   regenerate-ebooks:
     runs-on: ubuntu-latest
