@@ -1,7 +1,15 @@
 on:
+
+  # Required to enable manual trigger
+  workflow_dispatch:
+
+  schedule:
+     - cron: "0 0 * * 0"
+
   push:
     branches:
-      - "workflow-fix"
+      - "workflow-fix-2"
+
 jobs:
   regenerate-ebooks:
     runs-on: ubuntu-latest
