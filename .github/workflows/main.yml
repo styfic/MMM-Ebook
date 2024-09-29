@@ -1,4 +1,5 @@
 on:
+
   # Required to enable manual trigger
   workflow_dispatch:
 
