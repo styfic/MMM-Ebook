@@ -1,4 +1,7 @@
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "workflow-fix"
 jobs:
   regenerate-ebooks:
     runs-on: ubuntu-latest
