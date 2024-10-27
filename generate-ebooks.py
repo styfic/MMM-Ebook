@@ -229,15 +229,15 @@ def rewriteImageLinks(posts):
 
                     # Resize images to a max width of 800px to save space
                     try:
-                        image = Image.open(cachedImagePath)
-                        image.LOAD_TRUNCATED_IMAGES = True
-                        if not image.width <= 600:
-                            aspectRatioChange = IMG_MAX_WIDTH_PX / image.width
-                            height = int(image.height * aspectRatioChange)
+                        image2 = Image.open(cachedImagePath)
+                        image2.LOAD_TRUNCATED_IMAGES = True
+                        if not image2.width <= 600:
+                            aspectRatioChange = IMG_MAX_WIDTH_PX / image2.width
+                            height = int(image2.height * aspectRatioChange)
                             newSize = (IMG_MAX_WIDTH_PX, height)
-                            image = image.resize(newSize)
+                            image2 = image2.resize(newSize)
 
-                        image.save(cachedImagePath, optimize=True, quality=85)
+                        image2.save(cachedImagePath, optimize=True, quality=85)
                     except IOError as e:
                         print(f'Failed to open image at path {cachedImagePath} for resize, caching at original resolution, error: {e}')
                 except Exception as e:
