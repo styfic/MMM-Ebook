@@ -46,7 +46,14 @@ class RSSParser(object):
               
         url = "file://" + self.url if Path(self.url).exists() else self.url
         print("Trying to open and parse RSS feed @ <" + url + ">...")
-        doc = ET.parse(urlopen(url))
+
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+        )
+        xmldata = urllib.request.urlopen(req)
+
+        doc = ET.parse(xmldata)
         self.root = doc.getroot()
 
         # Cache the page        
@@ -225,7 +232,15 @@ def rewriteImageLinks(posts):
             cachedImagePath = os.path.join(CACHED_MEDIA, imageFilename)
             if not Path(cachedImagePath).exists():
                 try:
-                    urllib.request.urlretrieve(imageurl, cachedImagePath)
+                    # Create a request object with a legitimate browser User-Agent
+                    req = urllib.request.Request(
+                        imageurl, 
+                        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+                    )
+
+                    # Open the URL and save the stream directly to your local file path
+                    with urllib.request.urlopen(req) as response, open(cachedImagePath, 'wb') as out_file:
+                        out_file.write(response.read())
 
                     # Resize images to a max width of 800px to save space
                     try:
